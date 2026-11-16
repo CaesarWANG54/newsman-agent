@@ -1,0 +1,10 @@
+[
+  {"id":"preserved-number-unit","source":"OpenAI releases Codex with 10 ms latency.","en":"OpenAI releases Codex with 10 ms latency.","zh":"OpenAI 发布 Codex，延迟为 10 毫秒。","expected":"ready","issue":null},
+  {"id":"changed-number","source":"OpenAI releases Codex with 10 ms latency.","en":"OpenAI releases Codex with 20 ms latency.","zh":"OpenAI 发布 Codex，延迟为 20 毫秒。","expected":"needs_review","issue":"number_mismatch"},
+  {"id":"changed-unit","source":"OpenAI releases Codex with 10 ms latency.","en":"OpenAI releases Codex with 10 s latency.","zh":"OpenAI 发布 Codex，延迟为 10 秒。","expected":"needs_review","issue":"unit_mismatch"},
+  {"id":"negation-preserved","source":"OpenAI does not support image input.","en":"OpenAI does not support image input.","zh":"OpenAI 不支持图像输入。","expected":"ready","issue":null},
+  {"id":"negation-dropped","source":"OpenAI does not support image input.","en":"OpenAI supports image input.","zh":"OpenAI 支持图像输入。","expected":"needs_review","issue":"negation_mismatch"},
+  {"id":"wrong-subject","source":"OpenAI releases Codex.","en":"Microsoft releases Codex.","zh":"Microsoft 发布 Codex。","expected":"needs_review","issue":"subject_mismatch"},
+  {"id":"english-in-chinese-field","source":"OpenAI releases Codex for developers.","en":"OpenAI releases Codex for developers.","zh":"OpenAI releases Codex for developers.","expected":"degraded","issue":"invalid_translation"},
+  {"id":"model-code-preserved","source":"Anthropic releases Claude Sonnet 4.5.","en":"Anthropic releases Claude Sonnet 4.5.","zh":"Anthropic 发布 Claude Sonnet 4.5。","expected":"ready","issue":null}
+]

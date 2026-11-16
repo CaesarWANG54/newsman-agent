@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Offline Fixture News</title><link>https://fixture.example/</link><description>Isolated source fixture</description>
+<item><title>Fixture Labs releases TestKit</title><link>https://fixture.example/story</link><guid>fixture-1</guid><pubDate>Sun, 25 Oct 2026 00:30:00 GMT</pubDate><description>A synthetic feed excerpt.</description></item>
+</channel></rss>

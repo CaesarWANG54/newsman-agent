@@ -1,0 +1,98 @@
+name: newsman-agent
+
+x-backend: &backend
+  build: ./backend
+  image: newsman-agent-backend:local
+  env_file: .env
+  environment:
+    DATABASE_URL: postgresql+psycopg://newsman:newsman@postgres:5432/newsman
+    REDIS_URL: redis://redis:6379/0
+    NEWSMAN_FRONTEND_ORIGIN: http://localhost:${NEWSMAN_WEB_PORT:-3300}
+  volumes:
+    - digests:/app/digests
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: newsman
+      POSTGRES_USER: newsman
+      POSTGRES_PASSWORD: newsman
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U newsman -d newsman"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  initialize:
+    <<: *backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python -m newsman.cli.init_db
+    restart: "no"
+
+  api:
+    <<: *backend
+    ports:
+      - "127.0.0.1:${NEWSMAN_API_PORT:-8300}:8000"
+    depends_on:
+      initialize:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  worker:
+    <<: *backend
+    depends_on:
+      api:
+        condition: service_healthy
+    command: celery -A newsman.celery_app worker --loglevel=INFO --concurrency=2
+
+  beat:
+    <<: *backend
+    profiles: [schedule]
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - digests:/app/digests
+      - beat-state:/app/state
+    command: celery -A newsman.celery_app beat --loglevel=INFO --schedule=/app/state/celerybeat-schedule
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_NEWSMAN_API_BASE_URL: http://localhost:${NEWSMAN_API_PORT:-8300}
+    environment:
+      NEWSMAN_API_INTERNAL_URL: http://api:8000
+    ports:
+      - "127.0.0.1:${NEWSMAN_WEB_PORT:-3300}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+  redis-data:
+  digests:
+  beat-state:

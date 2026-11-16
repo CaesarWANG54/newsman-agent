@@ -1,0 +1,14 @@
+*
+!Dockerfile
+!package.json
+!package-lock.json
+!tsconfig.json
+!next-env.d.ts
+!next.config.mjs
+!eslint.config.mjs
+!app/
+!app/**
+!components/
+!components/**
+!lib/
+!lib/**
