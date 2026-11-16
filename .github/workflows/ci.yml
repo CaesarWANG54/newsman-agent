@@ -59,6 +59,11 @@ jobs:
       - run: cp .env.example .env
       - run: docker compose config --quiet
       - run: docker compose up --build -d --wait --wait-timeout 180
+      - name: Check the collector browser
+        run: >-
+          docker compose exec -T api python -c
+          "from playwright.sync_api import sync_playwright; p = sync_playwright().start();
+          browser = p.chromium.launch(headless=True); browser.close(); p.stop()"
       - run: python3 scripts/compose_smoke.py
       - if: failure()
         run: docker compose logs --no-color --tail=150

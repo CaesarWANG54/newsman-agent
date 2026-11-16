@@ -8,7 +8,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app/backend
 COPY requirements.lock ./
 RUN pip install --no-cache-dir --require-hashes -r requirements.lock
-RUN playwright install --with-deps chromium
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libatomic1 \
+    && playwright install --with-deps chromium \
+    && rm -rf /var/lib/apt/lists/*
 COPY pyproject.toml ./
 COPY newsman ./newsman
 RUN pip install --no-cache-dir --no-deps -e . \
